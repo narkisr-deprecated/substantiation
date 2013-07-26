@@ -6,7 +6,7 @@
 
   :exclusions [org.clojure/clojure]
 
-  :profiles {:dev { :dependencies [[midje "1.5.1" :exclusions [org.clojure/core.unify]]]}}
+  :profiles {:dev { :dependencies [[org.clojure/tools.trace "0.7.5"] [midje "1.5.1"]]}}
 
 
   :plugins  [[jonase/eastwood "0.0.2"] [lein-midje "3.0.0"] [lein-ancient "0.4.2"]
