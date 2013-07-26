@@ -31,16 +31,20 @@
         (apply f maps)))
     maps))
 
-(defn flatten-keys* [a ks m]
+(defn flatten-keys*
+  "Flatten map keys into vectors, used to calculate fast access vectors from descriptions"
+  [a ks m]
   (if (map? m)
     (reduce into (map (fn [[k v]] (flatten-keys* a (conj ks k) v)) (seq m)))
     (assoc a ks m)))
 
 (def ^:private flatten-mem (memoize flatten-keys*))
 
-(defn flatten-keys [m] (flatten-mem {} [] m))
+(defn flatten-keys 
+  "memoized version that spares us the need to calculate the access vector each time"
+  [m] (flatten-mem {} [] m))
 
-(def not-nil (comp not nil? ))
+(def not-nil (comp not nil?))
 
 (defmacro when-not-nil 
   "returns an fn that applies body on pred if values isn't nil else nil"
@@ -71,7 +75,7 @@
 
 (def ^:private externals (atom {}))
 
-(defn run-vs 
+(defn- run-vs 
   "Runs a set of validations on value" 
   [value vs] 
   {:pre [(set? vs)]}
@@ -87,7 +91,9 @@
       (let [e (run-vs (get-in m k) vs)]
         (if (seq e) (assoc-in errors k e) errors))) {} (flatten-keys validations)))
 
-(defn validation [type pred]
+(defn validation 
+  "define an custom validation with type and predicate"
+  [type pred]
   (swap! externals assoc type pred))
 
 (defn combine 
