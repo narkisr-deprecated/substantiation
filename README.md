@@ -2,7 +2,6 @@
 
 > additional proof that something that was believed (some fact or hypothesis or theory) is correct
 
-[![Build Status](https://travis-ci.org/narkisr/substantiation.png?branch=master)](https://travis-ci.org/narkisr/substantiation)
 
 Substantiation is an opinionated simple nested map validation framework:
 
@@ -14,6 +13,7 @@ Substantiation is an opinionated simple nested map validation framework:
  * High level decisions such as when to activate a group of validations should happen on upper layer.
  * Non strict, only described items checked.
  
+[![Build Status](https://travis-ci.org/narkisr/substantiation.png?branch=master)](https://travis-ci.org/narkisr/substantiation)
 
 ## Usage
 
