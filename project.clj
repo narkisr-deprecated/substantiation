@@ -2,7 +2,9 @@
   :description "An opinionated nested maps validations framework"
   :url "https://github.com/narkisr/substantiation"
   :license  {:name "Apache License, Version 2.0" :url "http://www.apache.org/licenses/LICENSE-2.0.html"}
-  :dependencies [[org.clojure/clojure "1.5.1"]]
+  :dependencies [[org.clojure/clojure "1.5.1"] 
+                 [slingshot "0.10.3"] 
+                 [org.clojure/core.incubator "0.1.2"]]
 
   :exclusions [org.clojure/clojure]
 
