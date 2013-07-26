@@ -1,13 +1,9 @@
 (ns subs.core
-  "A collection of sane validation functions for maps which are:
-   * validations are composable, just take two maps and deep-merge them
-   * No macros, all pure functions and ds 
-   * Simple to extend
-  Assumptions:
-   * Predicates should be able to handle nil, there is no ordering in how they are invoked
-   * You map define a :pre entry that defines when to activate a check
-  "
- )
+  ""
+  (:use 
+    [slingshot.slingshot :only  (throw+)]
+    [clojure.core.strint :only (<<)] 
+    [clojure.set :only (union)]))
 
 (defn- deep-merge
   "Recursively merges maps. If keys are not maps, the last value wins."
@@ -81,7 +77,10 @@
   {:pre [(set? vs)]}
   (let [merged (merge base @externals)]
     (filter identity 
-        (map #((merged %) value) vs))))
+        (map 
+          (fn [t] (if-let [v (merged t)] (v value) 
+            (throw+ {:message (<< "validation of type ~{t} not found, did your forget to define it?")
+                     :type ::missing-validation }))) vs))))
 
 (defn validate! 
   "validates a map with given validations" 
@@ -99,11 +98,5 @@
 (defn combine 
   "Combines a seq of validation descriptions"
   [& ds]
-  (apply deep-merge-with clojure.set/union ds))
+  (apply deep-merge-with union ds))
 
-(comment 
-  (validation :level  (when-not-nil #{:info :debug :error} "must be either info debug or error"))
-  (def m1 {:machine {:ip #{:String :required} :names #{:Vector}} :vcenter {:pool #{:String}}}) 
-  (def m2 {:machine {:ip #{:String :required} :names #{:required} :level #{:level}}}) 
-  (validate! {:machine {:names {:foo 1} :ip 1}} (combine m1 m2) :error ::non-valid-machine)
-  ) 

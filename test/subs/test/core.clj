@@ -1,4 +1,5 @@
 (ns subs.test.core
+  (:import clojure.lang.ExceptionInfo)
   (:use subs.core midje.sweet))
 
 (fact "basic validations"
@@ -8,8 +9,14 @@
 (fact "order does not matter"
   (validate! {:machine {:ip 1}} {:machine {:ip #{:required :String}}})) => {:machine {:ip '("must be a string")}}
 
+(fact "missing custom validation"
+  (let [v {:machine {:ip #{:String :required} :names #{:required} :level #{:level}}}] 
+    (validate! {:machine {:names {:foo 1} :ip 1}} v) => (throws ExceptionInfo)))
+
 (fact "composition"
   (let [ v1 {:machine {:ip #{:String :required} :names #{:Vector}} :vcenter {:pool #{:String}}} 
-         v2 {:machine {:ip #{:String :required} :names #{:required} :level #{:level}}}] 
+         v2 {:machine {:ip #{:String :required} :names #{:required} }}]
     (validate! {:machine {:names {:foo 1} :ip 1}} (combine v2 v1)) => 
          {:machine {:ip '("must be a string"), :names '("must be a vector")}}  ))  
+
+
