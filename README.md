@@ -72,6 +72,8 @@ Composing is trivial:
   (validate! {:machine {:names {:foo 1}}} (combine m2 m1))
 ```
 
+See [docs](http://narkisr.github.io/substantiation/)
+
 # Copyright and license
 
 Copyright [2013] [Ronen Narkis]
