@@ -67,7 +67,8 @@ Composing is trivial:
       :names #{:required}
       :level #{:level}}
    })
-  (validate! {:machine {:names {:foo 1}}} (deep-merge-with clojure.set/union m2 m1))
+
+  (validate! {:machine {:names {:foo 1}}} (deep-merge-with union m2 m1))
 ```
 
 # Copyright and license
