@@ -52,23 +52,24 @@ Adding validations is easy:
 
 Composing is trivial:
 ```clojure
-  (def m1 {
+  (def v1 {
     :machine {
       :ip #{:String :required} 
       :names #{:Vector}
     }
     :vcenter {
      :pool #{:String}
-   }})
+    }
+  })
 
-  (def m2 {
+  (def v2 {
     :machine {
       :ip #{:String :required} 
       :names #{:required}
       :level #{:level}}
-   })
+    })
 
-  (validate! {:machine {:names {:foo 1}}} (deep-merge-with union m2 m1))
+  (validate! {:machine {:names {:foo 1}}} (combine m2 m1))
 ```
 
 # Copyright and license
