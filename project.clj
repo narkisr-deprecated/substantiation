@@ -10,7 +10,7 @@
 
 
   :plugins  [[jonase/eastwood "0.0.2"] [lein-midje "3.0.0"] [lein-ancient "0.4.2"]
-             [lein-tag "0.1.0"] [lein-set-version "0.3.0"]]
+             [lein-tag "0.1.0"] [lein-set-version "0.3.0"] [codox "0.6.4"]]
 
  
   )
