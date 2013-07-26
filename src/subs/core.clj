@@ -9,14 +9,14 @@
   "
  )
 
-(defn deep-merge
+(defn- deep-merge
   "Recursively merges maps. If keys are not maps, the last value wins."
   [& vals]
   (if (every? map? vals)
     (apply merge-with deep-merge vals)
     (last vals)))
 
-(defn deep-merge-with
+(defn- deep-merge-with
   "Like merge-with, but merges maps recursively, applying the given fn
   only when there's a non-map at a particular level.
 
@@ -40,13 +40,13 @@
 
 (defn flatten-keys [m] (flatten-mem {} [] m))
 
-(def not-nil (comp nil? not))
+(def not-nil (comp not nil? ))
 
 (defmacro when-not-nil 
   "returns an fn that applies body on pred if values isn't nil else nil"
   [pred & body]
   `(fn [v#] 
-     (when (and (not-nil v#) (~pred v#))
+     (when (and (not-nil v#) (not (~pred v#)))
        ~@body
        )))
 
@@ -66,7 +66,7 @@
   :Set  (when-not-nil set? "must be a set")                     
   :Keyword  (when-not-nil keyword? "must be a keyword")                     
   :sequential  (when-not-nil sequential? "must be sequential")                     
-  :required  (when* empty? "must be present")                     
+  :required  (when* nil? "must be present")                     
   })
 
 (def ^:private externals (atom {}))
@@ -76,7 +76,8 @@
   [value vs] 
   {:pre [(set? vs)]}
   (let [merged (merge base @externals)]
-    (filter identity (map #((merged %) value) vs))))
+    (filter identity 
+        (map #((merged %) value) vs))))
 
 (defn validate! 
   "validates a map with given validations" 
@@ -89,8 +90,14 @@
 (defn validation [type pred]
   (swap! externals assoc type pred))
 
+(defn combine 
+  "Combines a seq of validation descriptions"
+  [& ds]
+  (apply deep-merge-with clojure.set/union ds))
+
 (comment 
   (validation :level  (when-not-nil #{:info :debug :error} "must be either info debug or error"))
   (def m1 {:machine {:ip #{:String :required} :names #{:Vector}} :vcenter {:pool #{:String}}}) 
   (def m2 {:machine {:ip #{:String :required} :names #{:required} :level #{:level}}}) 
-  (validate! {:machine {:names {:foo 1}}} (deep-merge-with clojure.set/union m2 m1) :error ::non-valid-machine)) 
+  (validate! {:machine {:names {:foo 1} :ip 1}} (combine m1 m2) :error ::non-valid-machine)
+  ) 
