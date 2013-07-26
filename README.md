@@ -20,7 +20,13 @@ Substantiation is an opinionated simple nested map validation framework:
 Description separated from actions:
 
 ```clojure
-(def machine-validations {:machine {:ip #{:String :required} :names #{:Vector}} :vcenter {:pool #{:String}}})   
+(def machine-validations {
+   :machine {
+     :ip #{:String :required} :names #{:Vector}
+    }
+   :vcenter {
+    :pool #{:String}
+   }})   
 ```
 Basic types validations baked in, validations are pure functions:
  
@@ -40,13 +46,27 @@ Basic types validations baked in, validations are pure functions:
 Adding validations is easy:
 
 ```clojure
-(validation :level  (when-not-nil #{:info :debug :error} "must be either info debug or error"))
+(validation :level 
+  (when-not-nil #{:info :debug :error} "must be either info debug or error"))
 ```
 
 Composing is trivial:
 ```clojure
-  (def m1 {:machine {:ip #{:String :required} :names #{:Vector}} :vcenter {:pool #{:String}}})
-  (def m2 {:machine {:ip #{:String :required} :names #{:required} :level #{:level}}})
+  (def m1 {
+    :machine {
+      :ip #{:String :required} 
+      :names #{:Vector}
+    }
+    :vcenter {
+     :pool #{:String}
+   }})
+
+  (def m2 {
+    :machine {
+      :ip #{:String :required} 
+      :names #{:required}
+      :level #{:level}}
+   })
   (validate! {:machine {:names {:foo 1}}} (deep-merge-with clojure.set/union m2 m1))
 ```
 
