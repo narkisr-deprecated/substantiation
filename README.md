@@ -52,24 +52,24 @@ Adding validations is easy:
 
 Composing is trivial:
 ```clojure
-  (def v1 {
-    :machine {
-      :ip #{:String :required} 
-      :names #{:Vector}
-    }
-    :vcenter {
-     :pool #{:String}
-    }
-  })
+(def v1 {
+  :machine {
+    :ip #{:String :required} 
+    :names #{:Vector}
+  }
+  :vcenter {
+    :pool #{:String}
+  }
+})
 
-  (def v2 {
-    :machine {
-      :ip #{:String :required} 
-      :names #{:required}
-      :level #{:level}}
-    })
+(def v2 {
+  :machine {
+    :ip #{:String :required} 
+    :names #{:required}
+    :level #{:level}}
+})
 
-  (validate! {:machine {:names {:foo 1}}} (combine m2 m1))
+(validate! {:machine {:names {:foo 1}}} (combine m2 m1))
 ```
 
 See [docs](http://narkisr.github.io/substantiation/)
