@@ -3,12 +3,12 @@
 > additional proof that something that was believed (some fact or hypothesis or theory) is correct
 
 
-Substantiation is an opinionated simple nested map validation framework:
+Substantiation is an opinionated simple nested map validation library:
 
- * Predicates and description kept seperate.
- * Validations map description sturcture follows validated input.
- * Pure datastructures to describe validations. 
- * Composeability of validations should be trivial.
+ * Predicates and description kept separate.
+ * Validations map description structure follows validated input.
+ * Pure data structures to describe validations. 
+ * Composability of validations is trivial.
  * Validation predicates scope is limited (can only access the checked value).
  * High level decisions such as when to activate a group of validations should happen on upper layer.
  * Non strict, only described items checked.
