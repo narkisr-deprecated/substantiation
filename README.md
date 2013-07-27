@@ -17,7 +17,7 @@ Substantiation is an opinionated simple nested map validation framework:
 
 ## Usage
 
-[substantiation "0.0.2"]
+[substantiation "0.0.3"]
 
 Description separated from actions:
 
