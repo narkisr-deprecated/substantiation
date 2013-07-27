@@ -74,6 +74,9 @@ Composing is trivial:
 })
 
 (validate! {:machine {:names {:foo 1}}} (combine m2 m1))
+
+; a fail fast version
+(validate! {:machine {:names {:foo 1}}} (combine m2 m1) :error ::non-valid-machine)
 ```
 
 See [docs](http://narkisr.github.io/substantiation/)
