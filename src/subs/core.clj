@@ -104,8 +104,7 @@
 (defn validate! 
   "validates a map with given validations, returns error map (or execption see :error) 
     options:
-     * :error - will throw execption of type :error if provided:
-        (validate! t m :error ::non-valid-m) 
+     :error - will throw exception of type :error if provided (validate! t m :error ::non-valid-m) 
   " 
   ([m validations & opts]
    (let [{:keys [error]} (apply hash-map opts) errors (validate! m validations)]
