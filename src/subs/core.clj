@@ -102,7 +102,11 @@
                      :type ::missing-validation }))) vs))))
 
 (defn validate! 
-  "validates a map with given validations" 
+  "validates a map with given validations, returns error map (or execption see :error) 
+    options:
+     * :error - will throw execption of type :error if provided:
+        (validate! t m :error ::non-valid-m) 
+  " 
   ([m validations & opts]
    (let [{:keys [error]} (apply hash-map opts) errors (validate! m validations)]
      (if (and error (-> errors empty? not))
