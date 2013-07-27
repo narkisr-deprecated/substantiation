@@ -6,11 +6,11 @@
 Substantiation is an opinionated simple nested map validation library:
 
  * Predicates and description kept separate.
- * Validations map description structure follows validated input.
+ * Validation description map follows validated input structure.
  * Pure data structures to describe validations. 
  * Composability of validations is trivial.
  * Validation predicates scope is limited (can only access the checked value).
- * High level decisions such as when to activate a group of validations should happen on upper layer.
+ * High level decisions such as when to activate a group of validations should happen on calling layer.
  * Non strict, only described items checked.
  
 [![Build Status](https://travis-ci.org/narkisr/substantiation.png?branch=master)](https://travis-ci.org/narkisr/substantiation)
