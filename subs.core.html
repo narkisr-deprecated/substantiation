@@ -7,7 +7,10 @@
 * Validation predicates scope is limited (can only access the checked value).
 * High level decisions such as when to activate a group of validations should happen on upper layer.
 * Non strict, only described items checked. </pre><div class="public" id="var-combine"><h3>combine</h3><div class="usage"><code>(combine &amp; ds)</code></div><pre class="doc">Combines a seq of validation descriptions
-</pre></div><div class="public" id="var-validate%21"><h3>validate!</h3><div class="usage"><code>(validate! m validations &amp; opts)</code><code>(validate! m validations)</code></div><pre class="doc">validates a map with given validations
+</pre></div><div class="public" id="var-validate%21"><h3>validate!</h3><div class="usage"><code>(validate! m validations &amp; opts)</code><code>(validate! m validations)</code></div><pre class="doc">validates a map with given validations, returns error map (or execption see :error) 
+options:
+ * :error - will throw execption of type :error if provided:
+    (validate! t m :error ::non-valid-m) 
 </pre></div><div class="public" id="var-validation"><h3>validation</h3><div class="usage"><code>(validation type pred)</code></div><pre class="doc">define an custom validation with type and predicate
 </pre></div><div class="public" id="var-when*"><h3>when*</h3><h4 class="macro">macro</h4><div class="usage"><code>(when* pred &amp; body)</code></div><pre class="doc">returns an fn that applies body on pred else nil
 </pre></div><div class="public" id="var-when-not-nil"><h3>when-not-nil</h3><h4 class="macro">macro</h4><div class="usage"><code>(when-not-nil pred &amp; body)</code></div><pre class="doc">returns an fn that applies body on pred if values isn't nil else nil
