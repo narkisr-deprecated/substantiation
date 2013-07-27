@@ -84,6 +84,7 @@
   :Set  (when-not-nil set? "must be a set")                     
   :Keyword  (when-not-nil keyword? "must be a keyword")                     
   :sequential  (when-not-nil sequential? "must be sequential")                     
+  :number  (when-not-nil number? "must be a number")                     
   :required  (when* nil? "must be present")                     
   })
 
@@ -102,11 +103,17 @@
 
 (defn validate! 
   "validates a map with given validations" 
-  [m validations & opts]
-  (reduce 
-    (fn [errors [k vs]] 
-      (let [e (run-vs (get-in m k) vs)]
-        (if (seq e) (assoc-in errors k e) errors))) {} (flatten-keys validations)))
+  ([m validations & opts]
+   (let [{:keys [error]} (apply hash-map opts) errors (validate! m validations)]
+     (if (and error (-> errors empty? not))
+       (throw+ {:type error :errors errors}) 
+       errors
+       )))
+  ([m validations]
+   (reduce 
+     (fn [errors [k vs]] 
+       (let [e (run-vs (get-in m k) vs)]
+         (if (seq e) (assoc-in errors k e) errors))) {} (flatten-keys validations))))
 
 (defn validation 
   "define an custom validation with type and predicate"
