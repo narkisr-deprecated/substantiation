@@ -45,7 +45,7 @@
         (apply f maps)))
     maps))
 
-(defn flatten-keys*
+(defn- flatten-keys*
   "Flatten map keys into vectors, used to calculate fast access vectors from descriptions"
   [a ks m]
   (if (map? m)
@@ -54,7 +54,7 @@
 
 (def ^:private flatten-mem (memoize flatten-keys*))
 
-(defn flatten-keys 
+(defn- flatten-keys 
   "memoized version that spares us the need to calculate the access vector each time"
   [m] (flatten-mem {} [] m))
 
