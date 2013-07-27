@@ -73,10 +73,20 @@ Composing is trivial:
     :level #{:level}}
 })
 
-(validate! {:machine {:names {:foo 1}}} (combine m2 m1))
+(validate! {:machine {:names {:foo 1}}} (combine v2 v1))
 
 ; a fail fast version
-(validate! {:machine {:names {:foo 1}}} (combine m2 m1) :error ::non-valid-machine)
+(validate! {:machine {:names {:foo 1}}} (combine v2 v1) :error ::non-valid-machine)
+```
+
+Erros are simple data structures as well:
+
+```clojure
+(fact "composition"
+  (let [ v1 {:machine {:ip #{:String :required} :names #{:Vector}} :vcenter {:pool #{:String}}} 
+         v2 {:machine {:ip #{:String :required} :names #{:required} }}]
+    (validate! {:machine {:names {:foo 1} :ip 1}} (combine v2 v1)) => 
+         {:machine {:ip '("must be a string"), :names '("must be a vector")}}  ))
 ```
 
 See [docs](http://narkisr.github.io/substantiation/)
