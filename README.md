@@ -95,12 +95,14 @@ Validations for sequences are just functions too:
 ; k-v types, every-kv helper is in subs.core
 (validation :node* (every-kv {:ip #{:required}}))
 
-(validate! {:nodes {:master {}}} {:nodes #{:node*}}); {:nodes '(({:master {:ip ("must be present")}})}
+; {:nodes '(({:master {:ip ("must be present")}})}
+(validate! {:nodes {:master {}}} {:nodes #{:node*}})
 
 ; sequence types, every-v helper is in subs.core
 (validation :name* (every-v #{:String :required}))
 
-(validate! {:names [1 "1"]} {:names #{:name*}});  {:names '(({0 ("must be a string")}))}
+; {:names '(({0 ("must be a string")}))}
+(validate! {:names [1 "1"]} {:names #{:name*}})
 ```
 See [docs](http://narkisr.github.io/substantiation/)
 
