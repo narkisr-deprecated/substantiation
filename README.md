@@ -100,7 +100,7 @@ Validations for sequences are just functions too:
 ; sequence types, every-v helper is in subs.core
 (validation :name* (every-v #{:String :required}))
 
-(validate! {:names [1 "1"]} {:names #{:name*}}) =>  {:names '(({0 ("must be a string")}))}
+(validate! {:names [1 "1"]} {:names #{:name*}});  {:names '(({0 ("must be a string")}))}
 ```
 See [docs](http://narkisr.github.io/substantiation/)
 
