@@ -35,7 +35,7 @@
 (fact "every item validations"
 
   (validate! {:nodes {:master {} :slave {}}} {:nodes #{:node*}}) => 
-   {:nodes '(({:master {:ip ("must be present")}} {:slave {:ip ("must be present")}}))}
+     {:nodes '(({:master {:ip ("must be present")}} {:slave {:ip ("must be present")}}))}
 
   (validate! {:names [1 "1"]} {:names #{:name*}}) =>  {:names '(({0 ("must be a string")}))}
 

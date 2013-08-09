@@ -18,7 +18,7 @@ Substantiation is an opinionated simple nested map validation library:
 ## Usage
 
 ```clojure
-  [substantiation "0.0.3"]
+  [substantiation "0.0.4"]
 ```
 
 Description separated from actions:
@@ -32,7 +32,7 @@ Description separated from actions:
     :pool #{:String}
    }})   
 ```
-Basic types validations baked in, validations are pure functions:
+Basic types validations baked in (part of the library), validations are pure functions:
  
 ```clojure
 (def ^:private base {
@@ -89,6 +89,19 @@ Erros are simple data structures as well:
          {:machine {:ip '("must be a string"), :names '("must be a vector")}}  ))
 ```
 
+Validations for sequences are just functions too:
+
+```clojure
+; k-v types, every-kv helper is in subs.core
+(validation :node* (every-kv {:ip #{:required}}))
+
+(validate! {:nodes {:master {}}} {:nodes #{:node*}}); {:nodes '(({:master {:ip ("must be present")}})}
+
+; sequence types, every-v helper is in subs.core
+(validation :name* (every-v #{:String :required}))
+
+(validate! {:names [1 "1"]} {:names #{:name*}}) =>  {:names '(({0 ("must be a string")}))}
+```
 See [docs](http://narkisr.github.io/substantiation/)
 
 # Copyright and license
