@@ -119,12 +119,12 @@
          (if (seq e) (assoc-in errors k e) errors))) {} (flatten-keys validations))))
 
 (defn every-kv 
-  "Every key value validation"
+  "Every key value validation helper"
   [vs]
   (fn [m] (filter identity (map (fn [[k v]] {k (validate! v vs)}) m))))
 
 (defn every-v 
-  "Every value validate"
+  "Every value validation helper fn"
   [vs]
    (fn [s] (filter not-empty (map-indexed (fn [i v] (validate! {i v} {i vs})) s)))
   )
