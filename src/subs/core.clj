@@ -91,12 +91,14 @@
 
 (def ^:private externals (atom {}))
 
+(def filter-empty (partial filter not-empty))
+
 (defn- run-vs 
   "Runs a set of validations on value" 
   [value vs] 
   {:pre [(set? vs)]}
   (let [merged (merge base @externals)]
-    (filter not-empty 
+    (filter-empty
       (map (fn [t] 
               (if-let [v (merged t)] (v value) 
                 (throw+ {:message (<< "validation of type ~{t} not found, did your forget to define it?")
@@ -121,13 +123,15 @@
 (defn every-kv 
   "Every key value validation helper"
   [vs]
-  (fn [m] (filter identity (map (fn [[k v]] {k (validate! v vs)}) m))))
+  (fn [m] 
+    (filter-empty
+            (map (fn [[k v]] 
+                   (let [res (validate! v vs)] (when (not-empty res) {k res}))) m))))
 
 (defn every-v 
   "Every value validation helper fn"
   [vs]
-   (fn [s] (filter not-empty (map-indexed (fn [i v] (validate! {i v} {i vs})) s)))
-  )
+  (fn [s] (filter-empty (map-indexed (fn [i v] (validate! {i v} {i vs})) s))))
 
 (defn validation 
   "define an custom validation with type and predicate"
