@@ -1,4 +1,4 @@
-(defproject substantiation "0.0.4"
+(defproject substantiation "0.0.5"
   :description "An opinionated nested maps validations framework"
   :url "https://github.com/narkisr/substantiation"
   :license  {:name "Apache License, Version 2.0" :url "http://www.apache.org/licenses/LICENSE-2.0.html"}
@@ -8,7 +8,9 @@
 
   :exclusions [org.clojure/clojure]
 
-  :profiles {:dev { :dependencies [[org.clojure/tools.trace "0.7.5"] [midje "1.5.1"]]}}
+  :profiles {:dev 
+              {:dependencies [[org.clojure/tools.trace "0.7.5"] [midje "1.5.1"]]
+               :set-version { :updates [{:path "README.md" :search-regex #"\"\d+\.\d+\.\d+\""}]}}}
 
                    
   :aliases {"autotest"
