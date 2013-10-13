@@ -5,7 +5,8 @@
 (fact "base validations"
   (validate! {:machine nil} {:machine {:ip #{:String :required}}}) => {:machine {:ip '("must be present")}}
   (validate! {:machine {:ip 1}} {:machine {:ip #{:String :required}}}) => {:machine {:ip '("must be a string")}}
-  (validate! {:machine {:names "1"}} {:machine {:names #{:Vector :required}}}) => {:machine {:names '("must be a vector")}})
+  (validate! {:machine {:names "1"}} {:machine {:names #{:Vector :required}}}) => {:machine {:names '("must be a vector")}}
+  (validate! {:machine {:used "1"}} {:machine {:used #{:Boolean :required}}}) => {:machine {:used '("must be a boolean")}})
 
 (fact "all just fine" 
   (validate! {:machine {:ip "1.2.3.4"}} {:machine {:ip #{:String :required}}}) => {})
