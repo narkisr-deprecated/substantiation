@@ -18,7 +18,7 @@ Substantiation is an opinionated simple nested map validation library:
 ## Usage
 
 ```clojure
-  [substantiation "0.0.6"]
+  [substantiation "0.0.7"]
 ```
 
 Description separated from actions:
