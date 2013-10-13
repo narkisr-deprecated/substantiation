@@ -81,7 +81,7 @@
 (def ^:private base {
    :String (when-not-nil string? "must be a string")                     
    :Integer  (when-not-nil integer? "must be a integer")                     
-   :Boolean (when-not-nil (or true? false?) "must be a boolean")                     
+   :Boolean (when-not-nil (partial contains? #{true false})  "must be a boolean")                     
    :Vector  (when-not-nil vector? "must be a vector")                     
    :Map  (when-not-nil map? "must be a map")                     
    :Set  (when-not-nil set? "must be a set")                     

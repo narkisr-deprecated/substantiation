@@ -9,7 +9,12 @@
   (validate! {:machine {:used "1"}} {:machine {:used #{:Boolean :required}}}) => {:machine {:used '("must be a boolean")}})
 
 (fact "all just fine" 
-  (validate! {:machine {:ip "1.2.3.4"}} {:machine {:ip #{:String :required}}}) => {})
+  (validate! {:machine {:ip "1.2.3.4" :used false}} {:machine {:ip #{:String :required} :used #{:Boolean}}}) => {})
+
+(fact "booleans" 
+   (validate! {:foo false} {:foo #{:Boolean :required}}) => {}
+   (validate! {:foo true} {:foo #{:Boolean :required}}) => {}
+   (validate! {:foo "true"} {:foo #{:Boolean :required}}) => {:foo '("must be a boolean")})
 
 (fact "order does not matter"
   (validate! {:machine {:ip 1}} {:machine {:ip #{:required :String}}})) => {:machine {:ip '("must be a string")}}
