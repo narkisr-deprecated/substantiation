@@ -32,19 +32,33 @@ Description separated from actions:
     :pool #{:String}
    }})   
 ```
-Basic types validations baked in (part of the library), validations are pure functions:
+Basic types validations baked in (part of the library), validations are just pure functions:
  
 ```clojure
+; when-not-nil ignore nil values, we have required for catching nils
 (def ^:private base {
-  :String (when-not-nil string? "must be a string")
-  :Integer  (when-not-nil integer? "must be a integer")
-  :Vector  (when-not-nil vector? "must be a vector")
-  :Map  (when-not-nil map? "must be a map")
-  :Set  (when-not-nil set? "must be a set")
-  :Keyword  (when-not-nil keyword? "must be a keyword")
-  :sequential  (when-not-nil sequential? "must be sequential")
-  :required  (when* empty? "must be present")
-  })
+   :String! (when-not-nil (every-pred string? not-empty) "must be a non empty string")                     
+   :String (when-not-nil string? "must be a string")                     
+   :Integer  (when-not-nil integer? "must be a integer")                     
+   :Boolean (when-not-nil (partial contains? #{true false})  "must be a boolean")                     
+   :Vector  (when-not-nil vector? "must be a vector")                     
+   :Vector!  (when-not-nil (every-pred vector? not-empty) "must be a non empty vector")                     
+   :Map  (when-not-nil map? "must be a map")                     
+   :Map!  (when-not-nil (every-pred map? not-empty) "must be a non empty map")                     
+   :Set  (when-not-nil set? "must be a set")                     
+   :Set!  (when-not-nil (every-pred set? not-empty) "must be a non empty set")                     
+   :Keyword  (when-not-nil keyword? "must be a keyword")                     
+   :sequential  (when-not-nil sequential? "must be sequential")                     
+   :number  (when-not-nil number? "must be a number")                     
+   :required  (when* nil? "must be present")})
+```
+
+Validation keys carry the following conventions:
+
+```clojure
+:Map ; => Upper casing for 'types'
+:Map! ; => Catch non empty (sequential) types
+:number ; => general or polymorphic types are lower case
 ```
 
 Adding validations is easy:
