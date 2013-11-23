@@ -3,10 +3,22 @@
   (:use subs.core midje.sweet))
 
 (fact "base validations"
-  (validate! {:machine nil} {:machine {:ip #{:String :required}}}) => {:machine {:ip '("must be present")}}
-  (validate! {:machine {:ip 1}} {:machine {:ip #{:String :required}}}) => {:machine {:ip '("must be a string")}}
-  (validate! {:machine {:names "1"}} {:machine {:names #{:Vector :required}}}) => {:machine {:names '("must be a vector")}}
-  (validate! {:machine {:used "1"}} {:machine {:used #{:Boolean :required}}}) => {:machine {:used '("must be a boolean")}})
+  (validate! {:machine nil} {:machine {:ip #{:String :required}}}) => 
+      {:machine {:ip '("must be present")}}
+  (validate! {:machine {:ip 1}} {:machine {:ip #{:String :required}}}) =>
+      {:machine {:ip '("must be a string")}}
+  (validate! {:machine {:names "1"}} {:machine {:names #{:Vector :required}}}) =>
+      {:machine {:names '("must be a vector")}}
+  (validate! {:machine {:used "1"}} {:machine {:used #{:Boolean :required}}}) =>
+      {:machine {:used '("must be a boolean")}})
+
+(fact "non empty validations"
+  (validate! {:machine {:ip ""}} {:machine {:ip #{:String! :required}}}) =>
+      {:machine {:ip '("must be a non empty string")}}
+  (validate! {:machine {:names ""}} {:machine {:names #{:Vector! :required}}}) =>
+      {:machine {:names '("must be a non empty vector")}}
+  (validate! {:machine {:templates {}}} {:machine {:templates #{:Map! :required}}}) =>
+      {:machine {:templates '("must be a non empty map")}})
 
 (fact "all just fine" 
   (validate! {:machine {:ip "1.2.3.4" :used false}} {:machine {:ip #{:String :required} :used #{:Boolean}}}) => {})
@@ -54,5 +66,4 @@
   (validate! {:nodes {:master {} :slave {:names [1]}}} {:nodes #{:named-node*}}) => 
        {:nodes '(({:master {:ip ("must be present")}} {:slave {:ip ("must be present") :names (({0 ("must be a string")}))}}))}
 
-  (validate! {0 1} {0 #{:String}}) => {0 '("must be a string")}
-  )
+  (validate! {0 1} {0 #{:String}}) => {0 '("must be a string")})

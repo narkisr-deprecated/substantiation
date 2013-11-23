@@ -60,6 +60,8 @@
 
 (def not-nil (comp not nil?))
 
+(def not-empty* (comp not empty?))
+
 (defmacro when-not-nil 
   "returns an fn that applies body on pred if values isn't nil else nil"
   [pred & body]
@@ -67,8 +69,6 @@
      (when (and (not-nil v#) (not (~pred v#)))
        ~@body
        )))
-
-
 
 (defmacro when*
   "returns an fn that applies body on pred else nil"
@@ -79,12 +79,16 @@
        )))
 
 (def ^:private base {
+   :String! (when-not-nil (every-pred string? not-empty) "must be a non empty string")                     
    :String (when-not-nil string? "must be a string")                     
    :Integer  (when-not-nil integer? "must be a integer")                     
    :Boolean (when-not-nil (partial contains? #{true false})  "must be a boolean")                     
    :Vector  (when-not-nil vector? "must be a vector")                     
+   :Vector!  (when-not-nil (every-pred vector? not-empty) "must be a non empty vector")                     
    :Map  (when-not-nil map? "must be a map")                     
+   :Map!  (when-not-nil (every-pred map? not-empty) "must be a non empty map")                     
    :Set  (when-not-nil set? "must be a set")                     
+   :Set!  (when-not-nil (every-pred set? not-empty) "must be a non empty set")                     
    :Keyword  (when-not-nil keyword? "must be a keyword")                     
    :sequential  (when-not-nil sequential? "must be sequential")                     
    :number  (when-not-nil number? "must be a number")                     
