@@ -99,15 +99,50 @@
 (def filter-empty (partial filter not-empty))
 
 (defn- run-vs 
-  "Runs a set of validations on value" 
+  "Runs a set of validations on a value" 
   [value vs] 
   {:pre [(set? vs)]}
   (let [merged (merge base @externals)]
     (filter-empty
-      (map (fn [t] 
-              (if-let [v (merged t)] (v value) 
-                (throw+ {:message (<< "validation of type ~{t} not found, did your forget to define it?")
-                         :type ::missing-validation }))) vs))))
+      (map 
+        (fn [t] 
+          (if-let [v (merged t)] 
+            (v value) 
+            (throw+ {:message (<< "validation of type ~{t} not found, did your forget to define it?") :type ::missing-validation }))) vs))))
+
+(defn keyz
+  "recursive map keys, ANY keys cause a fan out to all keys at the current level"
+   [m [k & ks]]
+   (if (= k ::ANY)
+    (mapcat
+      (fn [[k' v']] 
+        (mapv #(conj [k'] %) (keyz v' ks))) m)
+     (if (map? (m k))
+      (map #(conj [k] %) (keyz (m k) ks))
+       [k])))
+
+;; (println (map flatten (keyz {:a {:dev {:aws {:limits 1}}}} [:a :dev :aws :limits])))
+;; (println (map flatten (keyz {:aws {:limits 1} :proxmox {}} [::ANY :limits])))
+;; (println (map flatten (keyz {:a {:dev {:aws {:limits 1} :proxmox {}} :prod {:docker {:limits 2}}}} [::ANY ::ANY ::ANY :limits]))) 
+
+(defn get-in*
+  "like core get-in fans out ANY keys to all values at level" 
+   [m ks]
+    (let [kz (map flatten (keyz m ks))]
+      (map (partial get-in m) kz)))
+
+;; (get-in* {:a {:dev {:aws {:limits 1} :proxmox {}} :prod {:docker {:limits 2}}}} [::ANY ::ANY ::ANY :limits] )
+;; (get-in* {:a {:dev {:aws {:limits 1} :proxmox {}} :prod {:docker {:limits 2}}}} [:a :dev :aws :limits] )
+
+
+(defn run-validations 
+   "goes through validations" 
+   [errors [k vs]]
+  #_(let [e (run-vs (get-in* m k) vs)]
+    (if (seq e) 
+      (assoc-in errors k e)
+      errors))
+  )
 
 (defn validate! 
   "validates a map with given validations, returns error map (or execption see :error) 
@@ -117,13 +152,12 @@
    (let [{:keys [error]} (apply hash-map opts) errors (validate! m validations)]
      (if (and error (-> errors empty? not))
        (throw+ {:type error :errors errors}) 
-       errors
+        errors
        )))
   ([m validations]
-   (reduce 
-     (fn [errors [k vs]] 
-       (let [e (run-vs (get-in m k) vs)]
-         (if (seq e) (assoc-in errors k e) errors))) {} (flatten-keys validations))))
+   (reduce run-validations {} (flatten-keys validations))))
+
+(validate! {:aws {:limits 1} :proxmox {}} {:subs.core/ANY {:limits #{:required :Integer}}})
 
 (defn every-kv 
   "Every key value validation helper"
@@ -147,4 +181,3 @@
   "Combines a seq of validation descriptions"
   [& ds]
   (apply deep-merge-with union ds))
-

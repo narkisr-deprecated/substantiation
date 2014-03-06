@@ -67,3 +67,7 @@
        {:nodes '(({:master {:ip ("must be present")}} {:slave {:ip ("must be present") :names (({0 ("must be a string")}))}}))}
 
   (validate! {0 1} {0 #{:String}}) => {0 '("must be a string")})
+
+(fact "ANY key validations"
+   (validate! {:aws {:limits 1} :proxmox {}} {:subs.core/ANY {:limits #{:required :Integer}}}) => {} 
+      )
