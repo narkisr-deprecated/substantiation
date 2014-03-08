@@ -1,23 +1,30 @@
-(ns subs.access
-  "validations data access")
+(ns subs.access "validations data access")
+
+(defn add-vals 
+   [k ks]
+  {:test 
+   #(assert (= (add-vals :a (list :dev :foo)) (:a (:dev (:foo)))))}
+ (reduce 
+   (fn [r v] (cons v (list r))) (list (last ks)) (reverse (cons k (butlast ks)))))
+
+(use 'clojure.tools.trace)
 
 (defn keyz*
   "non flat version of keyz"
    [m [k & ks]]
-   (if (= k :subs/ANY)
-    (mapcat
-      (fn [[k' v']] 
-        (map
-          #(if % (cons k' (list %)) k') (keyz* v' ks))) m)
-     (if (map? (m k)) 
-        (map #(cons k (list %)) (keyz* (m k) ks)) 
-        (list (cons k (or ks '()))))))
+   (cond 
+    (and (= k :subs/ANY) ks) 
+       (mapcat 
+         (fn [[k' inner-map]] 
+           (map #(if % (cons k' (list %)) k') (keyz* inner-map ks))) m) 
 
-(keyz* {:aws {:limits 1} :proxmox {}} [:subs/ANY :limits])
+    (= k :subs/ANY) (map list (keys m))
 
-(keyz* {:dev {:aws {:limits 1} :proxmox {}}} [:a :dev :foo])
+    (and k (map? (m k)) (not (empty? (m k)))) (map #(cons k (list %)) (keyz* (m k) ks))
 
-(keyz* {:a {:dev {:aws {:limits 1} :proxmox {}} :prod {:docker {:limits 2}}}} [:a :dev :subs/ANY])
+    (and k ks) (list (add-vals k ks))
+
+    k (list (list k))))
 
 (defn keyz 
   "recursive map keys, ANY keys cause a fan out to all keys at the current level"
