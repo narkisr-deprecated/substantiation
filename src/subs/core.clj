@@ -19,6 +19,7 @@
   * High level decisions such as when to activate a group of validations should happen on upper layer.
   * Non strict, only described items checked. "
   (:use 
+    [subs.access :refer (get-in* keyz)]
     [slingshot.slingshot :only  (throw+)]
     [clojure.core.strint :only (<<)] 
     [clojure.set :only (union)]))
@@ -100,24 +101,34 @@
 
 (defn- run-vs 
   "Runs a set of validations on a value" 
-  [value vs] 
+  [vs [k value]] 
   {:pre [(set? vs)]}
   (let [merged (merge base @externals)]
     (filter-empty
       (map 
         (fn [t] 
           (if-let [v (merged t)] 
-            (v value) 
+            [k (v value)] 
             (throw+ {:message (<< "validation of type ~{t} not found, did your forget to define it?") :type ::missing-validation }))) vs))))
 
 (defn run-validations 
    "goes through validations" 
-   [errors [k vs]]
-  #_(let [e (run-vs (get-in* m k) vs)]
-    (if (seq e) 
-      (assoc-in errors k e)
-      errors))
-  )
+   [m errors [k vs]]
+  (let [key-vals (zipmap (keyz m k) (get-in* m k)) 
+        es (mapcat (partial run-vs vs) key-vals)]
+    (println k (keyz m k))
+    (merge errors
+      (reduce 
+        (fn [res [k' message]]
+          (if message (assoc-in res k' message) res)) {} es))))
+
+(validate! {:machine :ip } {:machine {:ip #{:String :required}}})
+
+;; (validate! {:machine {:ip 1}} {:machine {:ip #{:String :required}}})
+;;
+;; (validate! {:machine {:used "1"}} {:machine {:used #{:Boolean :required}}})
+
+;; (validate! {:dev {:aws {:limits ""} :proxmox {}} :prod {}} {:subs/ANY {:subs/ANY {:limits #{:required :Integer}}}})
 
 (defn validate! 
   "validates a map with given validations, returns error map (or execption see :error) 
@@ -130,17 +141,16 @@
         errors
        )))
   ([m validations]
-   (reduce run-validations {} (flatten-keys validations))))
+   (reduce (partial run-validations m) {} (flatten-keys validations))))
 
-;; (validate! {:aws {:limits 1} :proxmox {}} {:subs.core/ANY {:limits #{:required :Integer}}})
 
 (defn every-kv 
   "Every key value validation helper"
   [vs]
   (fn [m] 
     (filter-empty
-            (map (fn [[k v]] 
-                   (let [res (validate! v vs)] (when (not-empty res) {k res}))) m))))
+       (map (fn [[k v]] 
+         (let [res (validate! v vs)] (when (not-empty res) {k res}))) m))))
 
 (defn every-v 
   "Every value validation helper fn"
