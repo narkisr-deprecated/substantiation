@@ -116,19 +116,10 @@
    [m errors [k vs]]
   (let [key-vals (zipmap (keyz m k) (get-in* m k)) 
         es (mapcat (partial run-vs vs) key-vals)]
-    (println k (keyz m k))
     (merge errors
       (reduce 
         (fn [res [k' message]]
           (if message (assoc-in res k' message) res)) {} es))))
-
-(validate! {:machine :ip } {:machine {:ip #{:String :required}}})
-
-;; (validate! {:machine {:ip 1}} {:machine {:ip #{:String :required}}})
-;;
-;; (validate! {:machine {:used "1"}} {:machine {:used #{:Boolean :required}}})
-
-;; (validate! {:dev {:aws {:limits ""} :proxmox {}} :prod {}} {:subs/ANY {:subs/ANY {:limits #{:required :Integer}}}})
 
 (defn validate! 
   "validates a map with given validations, returns error map (or execption see :error) 
