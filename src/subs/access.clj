@@ -38,8 +38,12 @@
 
 (defn keyz 
   "recursive map keys, ANY keys cause a fan out to all keys at the current level"
-   [m ks]
-  (map flatten (keyz* m ks)))
+  [m ks]
+  (if (first (filter #(= :subs/ANY %) ks))
+    (map flatten (keyz* m ks))
+    [ks]
+    )
+  )
 
 (defn get-in*
   "like core get-in fans out ANY keys to all values at level" 
