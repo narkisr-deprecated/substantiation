@@ -8,9 +8,15 @@
 
   :exclusions [org.clojure/clojure]
 
-  :profiles {:dev 
-              {:dependencies [[org.clojure/tools.trace "0.7.5"] [midje "1.5.1"]]
-               :set-version { :updates [{:path "README.md" :search-regex #"\"\d+\.\d+\.\d+\""}]}}}
+  :profiles {
+   :dev {
+      :source-paths  ["dev" "src"]
+      :dependencies [[org.clojure/tools.trace "0.7.5"] [midje "1.5.1"]]
+      :set-version {
+        :updates [{:path "README.md" :search-regex #"\"\d+\.\d+\.\d+\""}]
+      }
+    }
+  }
 
                    
   :aliases {"autotest"
