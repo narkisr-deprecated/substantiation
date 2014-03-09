@@ -53,18 +53,20 @@
 (fact "every item validations"
 
   (validate! {:proxmox {:nodes {:master {} :slave {}}}} {:proxmox {:nodes #{:node*}}}) => 
-     {:proxmox {:nodes '(({:master {:ip "must be present"}} {:slave {:ip "must be present"}}))}}
+     {:proxmox {:nodes '({:master {:ip "must be present"}} {:slave {:ip "must be present"}})}}
 
   (validate! {:proxmox {:nodes {:master {:ip 123}}}} {:proxmox {:nodes #{:node*}}}) => {}
 
-  (validate! {:names [1 "1"]} {:names #{:name*}}) =>  {:names '(({0 "must be a string"}))}
+  (validate! {:names [1 "1"]} {:names #{:name*}}) =>  {:names '({0 "must be a string"})}
 
   (validate! {:names ["1"]} {:names #{:name*}}) =>  {}
 
-  (validate! {:names '("1" "2" 3)} {:names #{:name* :Vector}}) => '{:names (({2 "must be a string"}) "must be a vector")}
+  (validate! {:names '("1" "2" 3)} {:names #{:name* :Vector}}) => '{:names "must be a vector"}
+
+  (validate! {:names ["1" "2" 3]} {:names #{:name* :Vector}}) => '{:names ({2 "must be a string"})}
 
   (validate! {:nodes {:master {} :slave {:names [1]}}} {:nodes #{:named-node*}}) => 
-       {:nodes '(({:master {:ip "must be present"}} {:slave {:ip "must be present" :names (({0 "must be a string"}))}}))}
+       {:nodes '({:master {:ip "must be present"}} {:slave {:ip "must be present" :names ({0 "must be a string"})}})}
 
   (validate! {0 1} {0 #{:String}}) => {0 "must be a string"})
 
