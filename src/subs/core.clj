@@ -116,7 +116,7 @@
    [m errors [k vs]]
   (let [key-vals (zipmap (keyz m k) (get-in* m k)) 
         es (mapcat (partial run-vs vs) key-vals)]
-    (merge errors
+    (merge-with merge errors
       (reduce 
         (fn [res [k' message]]
           (if message (assoc-in res k' message) res)) {} es))))
