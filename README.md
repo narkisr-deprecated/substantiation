@@ -100,7 +100,7 @@ Erros are simple data structures as well:
   (let [ v1 {:machine {:ip #{:String :required} :names #{:Vector}} :vcenter {:pool #{:String}}} 
          v2 {:machine {:ip #{:String :required} :names #{:required} }}]
     (validate! {:machine {:names {:foo 1} :ip 1}} (combine v2 v1)) => 
-         {:machine {:ip '("must be a string"), :names '("must be a vector")}}  ))
+         {:machine {:ip "must be a string", :names "must be a vector"}}  ))
 ```
 
 Validations for sequences are just functions too:
@@ -118,6 +118,16 @@ Validations for sequences are just functions too:
 ; {:names '(({0 ("must be a string")}))}
 (validate! {:names [1 "1"]} {:names #{:name*}})
 ```
+
+Validating using fuzzy matching, in some cases we would like to validate hashes that have dynamic key sets but still share a common structure:
+
+```clojure
+(fact "ANY"
+  (validate! {:aws {:limits 1} :proxmox {}} {:subs/ANY {:limits #{:required :Integer}}}) 
+    => {:proxmox {:limits "must be present"}})
+```
+
+
 See [docs](http://narkisr.github.io/substantiation/)
 
 # Copyright and license
