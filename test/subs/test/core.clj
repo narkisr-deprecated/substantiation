@@ -70,6 +70,16 @@
 
   (validate! {0 1} {0 #{:String}}) => {0 "must be a string"})
 
-#_(fact "ANY key validations"
-   (validate! {:aws {:limits 1} :proxmox {}} {:subs.core/ANY {:limits #{:required :Integer}}}) => {} 
+(fact "ANY key validations"
+   (validate! {:aws {:limits 1} :proxmox {}} {:subs/ANY {:limits #{:required :Integer}}}) => {:proxmox {:limits "must be present"}}
+
+   (validate! {:dev {:aws {:limits 1} :proxmox {}}} {:subs/ANY {:subs/ANY {:limits #{:required :Integer}}}}) => 
+      {:dev {:proxmox {:limits "must be present"}}}
+
+   (validate! {:dev {:aws {:limits 1} :proxmox {}}} {:dev {:subs/ANY {:limits #{:required :Integer}}}}) => 
+      {:dev {:proxmox {:limits "must be present"}}}
+
+   (validate! {:dev {:aws {:limits 1} :proxmox {}} :qa {} :prod {:aws {:limits ""} :vcenter {}}} {:subs/ANY {:subs/ANY {:limits #{:required :Integer}}}}) => 
+      {:dev {:proxmox {:limits "must be present"}} :prod {:aws {:limits "must be a integer"} :vcenter {:limits "must be present"}}}
+
       )
