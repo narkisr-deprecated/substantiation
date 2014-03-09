@@ -1,4 +1,8 @@
-(ns subs.access "validations data access")
+(ns subs.access 
+  "validations data access"
+  (:require 
+    [clojure.core.strint :refer (<<)] 
+    [slingshot.slingshot :refer (throw+)]))
 
 (defn add-vals 
    [k ks]
@@ -11,20 +15,26 @@
 
 (defn keyz*
   "non flat version of keyz"
-   [m [k & ks]]
-   (cond 
+  [m [k & ks]]
+  (cond 
     (and (= k :subs/ANY) ks) 
-       (mapcat 
-         (fn [[k' inner-map]] 
-           (map #(if % (cons k' (list %)) k') (keyz* inner-map ks))) m) 
+      (mapcat 
+        (fn [[k' inner-map]] 
+          (map #(if % (cons k' (list %)) k') (keyz* inner-map ks))) m) 
 
-    (= k :subs/ANY) (map list (keys m))
+    (= k :subs/ANY) 
+       (map list (keys m))
 
-    (and k (map? (m k)) (not (empty? (m k)))) (map #(cons k (list %)) (keyz* (m k) ks))
+    (and ks (map? (m k)) (not (empty? (m k)))) 
+       (map #(cons k (list %)) (keyz* (m k) ks))
 
-    (and k ks) (list (add-vals k ks))
+    (and k ks); map does not match ks 
+      (throw+ {:message (<< "failed to validate ~{m} since it does not contain key ~{k}") :type ::missing-key })
 
-    k (list (list k))))
+     k (list (list k)) 
+
+    :else (throw+ {:message (<< "illegal state") :type ::else-clause-reached})
+    ))
 
 (defn keyz 
   "recursive map keys, ANY keys cause a fan out to all keys at the current level"
