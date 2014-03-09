@@ -47,7 +47,6 @@
 
 (defn get-in*
   "like core get-in fans out ANY keys to all values at level" 
-   [m ks]
-    (let [kz (keyz m ks)]
-      (map (partial get-in m) kz)))
+  [m ks]
+   (map (partial get-in m) (keyz m ks)))
 
