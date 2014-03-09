@@ -1,4 +1,5 @@
 (ns subs.test.access
+  (:import clojure.lang.ExceptionInfo)
   (:use midje.sweet)
   (:require [subs.access :as a :refer (keyz get-in*)]))
 
@@ -10,15 +11,18 @@
       => '((:a :dev :aws :limits) (:a :dev :proxmox :limits) (:a :prod :docker :limits))
 
   (keyz {:a {:dev {:aws {:limits 1} :proxmox {}} :prod {:docker {:limits 2}}}} [:a :dev :subs/ANY]) => 
-      '((:a :dev :aws) (:a :dev :proxmox))
-  )
+      '((:a :dev :aws) (:a :dev :proxmox)))
 
 (fact "non sub keys"
-  (keyz {:dev {:aws {:limits 1} :proxmox {}}} [:a :dev :foo]) => '((:a :dev :foo))
 
   (keyz {:a {:dev {:aws {:limits 1}}}} [:a :dev :aws :limits]) => '((:a :dev :aws :limits))
 
-  (keyz {:machine {:templates {}}} [:machine :templates]) => '((:machine :templates)))
+  (keyz {:machine {:templates {}}} [:machine :templates]) => '((:machine :templates))
+
+  (keyz {:machine {:names {:foo 1} :ip 1}} [:machine :names]) => '((:machine :names)))
+
+(fact "map does not match keys"
+  (keyz {:dev {:aws {:limits 1} :proxmox {}}} [:a :subs/ANY :foo]) => (throws ExceptionInfo))
 
 (fact "get-in*" filters
   (get-in* {:a {:dev {:aws {:limits 1} :proxmox {}} :prod {:docker {:limits 2}}}} [:subs/ANY :subs/ANY :subs/ANY :limits]) =>
