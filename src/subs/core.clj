@@ -104,7 +104,7 @@
   [vs [k value]] 
   {:pre [(set? vs)]}
   (let [merged (merge base @externals)]
-    (filter-empty
+    (filter (fn [[k e]] (not (empty? e)))
       (map 
         (fn [t] 
           (if-let [v (merged t)] 
