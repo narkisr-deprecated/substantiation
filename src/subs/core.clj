@@ -136,9 +136,6 @@
   ([m validations]
    (reduce (partial run-validations m) {} (flatten-keys validations))))
 
-(validate! {:hypervisor {:dev {:aws {}}}} 
-     {:hypervisor {:dev {:aws {:secret-key #{:required :String} :access-key #{:required :String}}}}})
-
 (defn every-kv 
   "Every key value validation helper"
   [vs]
