@@ -1,4 +1,4 @@
-(defproject substantiation "0.1.1"
+(defproject substantiation "0.1.2"
   :description "An opinionated nested maps validations framework"
   :url "https://github.com/narkisr/substantiation"
   :license  {:name "Apache License, Version 2.0" :url "http://www.apache.org/licenses/LICENSE-2.0.html"}
