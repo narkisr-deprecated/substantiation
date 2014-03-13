@@ -111,15 +111,17 @@
             [k (v value)] 
             (throw+ {:message (<< "validation of type ~{t} not found, did your forget to define it?") :type ::missing-validation }))) vs))))
 
+(use 'clojure.tools.trace)
+
 (defn run-validations 
    "goes through validations" 
    [m errors [k vs]]
   (let [key-vals (zipmap (keyz m k) (get-in* m k)) 
         es (mapcat (partial run-vs vs) key-vals)]
-    (merge-with merge errors
+    (deep-merge errors
       (reduce 
         (fn [res [k' message]]
-          (if message (assoc-in res k' message) res)) {} es))))
+          (if message (merge-with merge res (assoc-in res k' message)) res)) {} es))))
 
 (defn validate! 
   "validates a map with given validations, returns error map (or execption see :error) 
@@ -133,7 +135,6 @@
        )))
   ([m validations]
    (reduce (partial run-validations m) {} (flatten-keys validations))))
-
 
 (defn every-kv 
   "Every key value validation helper"

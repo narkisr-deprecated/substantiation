@@ -1,8 +1,9 @@
 (ns subs.access 
   "validations data access"
+  (:import clojure.lang.ExceptionInfo)
   (:require 
     [clojure.core.strint :refer (<<)] 
-    [slingshot.slingshot :refer (throw+)]))
+    [slingshot.slingshot :refer (throw+ try+)]))
 
 (defn add-vals 
    [k ks]
@@ -23,22 +24,30 @@
     (= k :subs/ANY) 
        (map list (keys m))
 
-    (and ks (map? (m k)) (not (empty? (m k)))) 
+    (and m ks (map? (m k)) (not (empty? (m k)))) 
        (map #(cons k (list %)) (keyz* (m k) ks))
 
     (and k ks); map does not match ks 
-      (throw+ {:message (<< "failed to validate ~{m} since it does not contain key ~{k}") :type ::missing-key })
+      (throw+ {:type ::missing-key} "could not match keys")
 
      k (list (list k)) 
 
     :else (throw+ {:message (<< "illegal state") :type ::else-clause-reached})
     ))
 
+
+
 (defn keyz 
   "recursive map keys, ANY keys cause a fan out to all keys at the current level"
   [m ks]
   (if (first (filter #(= :subs/ANY %) ks))
-    (map flatten (keyz* m ks))
+    (map flatten 
+      (try (keyz* m ks) 
+        (catch ExceptionInfo e
+          (when (= (-> e bean :data :object :type) ::missing-key) 
+           (throw+ {:type ::any-key-match-error} (<< "Could not get ~{ks} from ~{m} since it does not match map structure")))
+          (throw e) 
+          )))
     [ks]
     )
   )
@@ -47,4 +56,3 @@
   "like core get-in fans out ANY keys to all values at level" 
   [m ks]
    (map (partial get-in m) (keyz m ks)))
-

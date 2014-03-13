@@ -23,13 +23,27 @@
 (fact "all just fine" 
   (validate! {:machine {:ip "1.2.3.4" :used false}} {:machine {:ip #{:String :required} :used #{:Boolean}}}) => {})
 
+(fact "multiple errors" 
+   (validate! {:foo false :bar ""} {:foo #{:String} :bar #{:Integer}}) => 
+      {:foo "must be a string" :bar "must be a integer"}
+
+   (validate! {:hypervisor {:dev {:aws {}}}} 
+     {:hypervisor {:dev {:aws {:secret-key #{:required :String} :access-key #{:required :String}}}}}) => 
+    {:hypervisor {:dev {:aws {:access-key "must be present", :secret-key "must be present"}}}}
+  )
+
+(fact "booleans" 
+   (validate! {:foo false} {:foo #{:Boolean :required}}) => {}
+   (validate! {:foo true} {:foo #{:Boolean :required}}) => {}
+  )
+
 (fact "booleans" 
    (validate! {:foo false} {:foo #{:Boolean :required}}) => {}
    (validate! {:foo true} {:foo #{:Boolean :required}}) => {}
    (validate! {:foo "true"} {:foo #{:Boolean :required}}) => {:foo "must be a boolean"})
 
 (fact "order does not matter"
-  (validate! {:machine {:ip 1}} {:machine {:ip #{:required :String}}})) => {:machine {:ip '("must be a string")}}
+  (validate! {:machine {:ip 1}} {:machine {:ip #{:required :String}}})) => {:machine {:ip "must be a string"}}
 
 (fact "missing custom validation"
   (let [v {:machine {:ip #{:String :required} :names #{:required} :level #{:level}}}] 
@@ -61,9 +75,8 @@
 
   (validate! {:names ["1"]} {:names #{:name*}}) =>  {}
 
-  (validate! {:names '("1" "2" 3)} {:names #{:name* :Vector}}) => '{:names "must be a vector"}
-
-  (validate! {:names ["1" "2" 3]} {:names #{:name* :Vector}}) => '{:names ({2 "must be a string"})}
+  (validate! {:names '("1" "2" 3)} {:names #{:name* :Vector}}) => 
+      {:names '("must be a vector" {2 "must be a string"})}
 
   (validate! {:nodes {:master {} :slave {:names [1]}}} {:nodes #{:named-node*}}) => 
        {:nodes '({:master {:ip "must be present"}} {:slave {:ip "must be present" :names ({0 "must be a string"})}})}

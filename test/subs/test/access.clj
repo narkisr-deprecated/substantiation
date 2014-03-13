@@ -22,7 +22,12 @@
   (keyz {:machine {:names {:foo 1} :ip 1}} [:machine :names]) => '((:machine :names)))
 
 (fact "map does not match keys"
-  (keyz {:dev {:aws {:limits 1} :proxmox {}}} [:a :subs/ANY :foo]) => (throws ExceptionInfo))
+  (keyz {:dev {:aws {:limits 1} :proxmox {}}} [:a :subs/ANY :foo]) => (throws ExceptionInfo)
+
+  (keyz {:username "foo" :quotas {:proxmox {:used nil} }} [:quotas :subs/ANY :subs/ANY :used :count]) => (throws ExceptionInfo)
+      
+  (get-in* {:username "foo" :quotas {:proxmox {:used nil} }} [:quotas :subs/ANY :subs/ANY :used :count]) => (throws ExceptionInfo))
+
 
 (fact "get-in*" filters
   (get-in* {:a {:dev {:aws {:limits 1} :proxmox {}} :prod {:docker {:limits 2}}}} [:subs/ANY :subs/ANY :subs/ANY :limits]) =>
