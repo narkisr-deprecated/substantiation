@@ -111,8 +111,6 @@
             [k (v value)] 
             (throw+ {:message (<< "validation of type ~{t} not found, did your forget to define it?") :type ::missing-validation }))) vs))))
 
-(use 'clojure.tools.trace)
-
 (defn run-validations 
    "goes through validations" 
    [m errors [k vs]]
