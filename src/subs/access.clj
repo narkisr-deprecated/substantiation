@@ -11,8 +11,6 @@
  (reduce 
    (fn [r v] (cons v (list r))) (list (last ks)) (reverse (cons k (butlast ks)))))
 
-(use 'clojure.tools.trace)
-
 (defn keyz*
   "non flat version of keyz"
   [m [k & ks]]
