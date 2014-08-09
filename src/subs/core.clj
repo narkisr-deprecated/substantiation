@@ -18,11 +18,12 @@
   * Validation predicates scope is limited (can only access the checked value).
   * High level decisions such as when to activate a group of validations should happen on upper layer.
   * Non strict, only described items checked. "
-  (:use 
+  (:require 
     [subs.access :refer (get-in* keyz)]
-    [slingshot.slingshot :only  (throw+)]
-    [clojure.core.strint :only (<<)] 
-    [clojure.set :only (union)]))
+    [slingshot.slingshot :refer  (throw+)]
+    [clojure.core.strint :refer (<<)] 
+    [subs.exp :refer (expand)] 
+    [clojure.set :refer (union)]))
 
 (defn- deep-merge
   "Recursively merges maps. If keys are not maps, the last value wins."
@@ -99,11 +100,16 @@
 
 (def filter-empty (partial filter not-empty))
 
+(defn registry
+   "all registered validations" 
+   []
+  (merge base @externals))
+
 (defn- run-vs 
   "Runs a set of validations on a value" 
   [vs [k value]] 
   {:pre [(set? vs)]}
-  (let [merged (merge base @externals)]
+  (let [merged (registry)]
     (filter (fn [[k e]] (not (empty? e)))
       (map 
         (fn [t] 
@@ -132,7 +138,7 @@
         errors
        )))
   ([m validations]
-   (reduce (partial run-validations m) {} (flatten-keys validations))))
+   (reduce (partial run-validations m) {} (flatten-keys (expand validations (registry))))))
 
 (defn every-kv 
   "Every key value validation helper"

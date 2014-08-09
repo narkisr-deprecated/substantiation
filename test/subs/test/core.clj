@@ -96,3 +96,14 @@
       {:dev {:proxmox {:limits "must be present"}} :prod {:aws {:limits "must be a integer"} :vcenter {:limits "must be present"}}}
 
       )
+
+
+;; (validate! {:me {:ip "123"}} {:me #{:person}})
+
+;; (validate! {:ip "123"} {:ip #{:Integer}})
+ 
+(validation :person {:name #{:String :required} :id #{:Integer :required}} )
+
+(fact "components" 
+   (validate! {:me {:id ""}} {:me #{:person}}) => {:me {:id "must be a integer" :name "must be present" }}
+  )
