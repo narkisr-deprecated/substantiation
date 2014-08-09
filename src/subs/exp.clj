@@ -38,16 +38,3 @@
         (assoc res k (expand v registry))
         (assoc res k (expand-set v registry)))) {} m))
 
-;; (subs.core/validation :address {:street #{:String :required}})
-;;
-;; (subs.core/validation :person {:name #{:String :required} :living #{:address}})
-;;
-;; (subs.core/validation :vehicle {:license #{:Integer :required}})
-;;
-;; (expand 
-;;   {:me {:name #{:String :required} :id #{:Integer :required}}})
-;;
-;; (expand 
-;;   {:me #{:person} :car #{:vehicle}})
-;;
-;;
