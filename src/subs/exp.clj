@@ -1,7 +1,6 @@
 (ns subs.exp
   "Expanding validations"
-  (:require 
-    [clojure.tools.trace :refer (trace)]))
+  )
 
 (defn expandable?
    "checks is there an expanable item" 
