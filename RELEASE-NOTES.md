@@ -4,3 +4,4 @@
 
 ## New Features
 
+* Adding subtract enabling to clear items from validation map.
