@@ -55,6 +55,11 @@
     (validate! {:machine {:names {:foo 1} :ip 1}} (combine v2 v1)) => 
          {:machine {:ip "must be a string", :names "must be a vector"}}  ))  
 
+(fact "subtractions"
+  (let [ v1 {:machine {:ip #{:String :required} :names #{:Vector}} :vcenter {:pool #{:String}}} 
+         v2 {:machine #{:ip}}]
+    (subtract v1 v2) =>  {:machine {:names #{:Vector}} :vcenter {:pool #{:String}}} ))
+
 (fact "with error" 
    (validate! {:machine {:ip 1}} {:machine {:ip #{:String :required}}} :error ::non-vaild-machine) => (throws ExceptionInfo))
 

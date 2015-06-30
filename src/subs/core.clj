@@ -22,6 +22,7 @@
     [subs.access :refer (get-in* keyz)]
     [slingshot.slingshot :refer  (throw+)]
     [clojure.core.strint :refer (<<)] 
+    [clojure.core.incubator :refer (dissoc-in)]
     [subs.exp :refer (expand)] 
     [clojure.set :refer (union)]))
 
@@ -162,3 +163,17 @@
   "Combines a seq of validation descriptions"
   [& ds]
   (apply deep-merge-with union ds))
+
+(defn dissoc-set 
+   [m ks v]
+   (reduce (fn [r k] (dissoc-in r (into ks [k]))) m v)
+  )
+
+
+(defn subtract 
+   "Remove validations from an existing validation hash" 
+   [m s]
+   (reduce (fn [r [k v]] (dissoc-set r k v) ) m (flatten-keys s))
+  )
+
+
