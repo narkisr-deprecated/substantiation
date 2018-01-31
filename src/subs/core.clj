@@ -18,12 +18,11 @@
   * Validation predicates scope is limited (can only access the checked value).
   * High level decisions such as when to activate a group of validations should happen on upper layer.
   * Non strict, only described items checked. "
-  (:require 
+  (:require
     [subs.access :refer (get-in* keyz)]
-    [slingshot.slingshot :refer  (throw+)]
-    [clojure.core.strint :refer (<<)] 
+    [clojure.core.strint :refer (<<)]
     [clojure.core.incubator :refer (dissoc-in)]
-    [subs.exp :refer (expand)] 
+    [subs.exp :refer (expand)]
     [clojure.set :refer (union)]))
 
 (defn- deep-merge
@@ -57,7 +56,7 @@
 
 (def ^:private flatten-mem (memoize flatten-keys*))
 
-(defn- flatten-keys 
+(defn- flatten-keys
   "memoized version that spares us the need to calculate the access vector each time"
   [m] (flatten-mem {} [] m))
 
@@ -65,10 +64,10 @@
 
 (def not-empty* (comp not empty?))
 
-(defmacro when-not-nil 
+(defmacro when-not-nil
   "returns an fn that applies body on pred if values isn't nil else nil"
   [pred & body]
-  `(fn [v#] 
+  `(fn [v#]
      (when (and (not-nil v#) (not (~pred v#)))
        ~@body
        )))
@@ -76,25 +75,25 @@
 (defmacro when*
   "returns an fn that applies body on pred else nil"
   [pred & body]
-  `(fn [v#] 
+  `(fn [v#]
      (when (~pred v#)
        ~@body
        )))
 
 (def ^:private base {
-   :String! (when-not-nil (every-pred string? not-empty) "must be a non empty string")                     
-   :String (when-not-nil string? "must be a string")                     
-   :Integer  (when-not-nil integer? "must be a integer")                     
-   :Boolean (when-not-nil (partial contains? #{true false})  "must be a boolean")                     
-   :Vector  (when-not-nil vector? "must be a vector")                     
-   :Vector!  (when-not-nil (every-pred vector? not-empty) "must be a non empty vector")                     
-   :Map  (when-not-nil map? "must be a map")                     
-   :Map!  (when-not-nil (every-pred map? not-empty) "must be a non empty map")                     
-   :Set  (when-not-nil set? "must be a set")                     
-   :Set!  (when-not-nil (every-pred set? not-empty) "must be a non empty set")                     
-   :Keyword  (when-not-nil keyword? "must be a keyword")                     
-   :sequential  (when-not-nil sequential? "must be sequential")                     
-   :number  (when-not-nil number? "must be a number")                     
+   :String! (when-not-nil (every-pred string? not-empty) "must be a non empty string")
+   :String (when-not-nil string? "must be a string")
+   :Integer  (when-not-nil integer? "must be a integer")
+   :Boolean (when-not-nil (partial contains? #{true false})  "must be a boolean")
+   :Vector  (when-not-nil vector? "must be a vector")
+   :Vector!  (when-not-nil (every-pred vector? not-empty) "must be a non empty vector")
+   :Map  (when-not-nil map? "must be a map")
+   :Map!  (when-not-nil (every-pred map? not-empty) "must be a non empty map")
+   :Set  (when-not-nil set? "must be a set")
+   :Set!  (when-not-nil (every-pred set? not-empty) "must be a non empty set")
+   :Keyword  (when-not-nil keyword? "must be a keyword")
+   :sequential  (when-not-nil sequential? "must be sequential")
+   :number  (when-not-nil number? "must be a number")
    :required  (when* nil? "must be present")})
 
 (def ^:private externals (atom {}))
@@ -102,76 +101,76 @@
 (def filter-empty (partial filter not-empty))
 
 (defn registry
-   "all registered validations" 
+   "all registered validations"
    []
   (merge base @externals))
 
-(defn- run-vs 
-  "Runs a set of validations on a value" 
-  [vs [k value]] 
+(defn- run-vs
+  "Runs a set of validations on a value"
+  [vs [k value]]
   {:pre [(set? vs)]}
   (let [merged (registry)]
     (filter (fn [[k e]] (not (empty? e)))
-      (map 
-        (fn [t] 
-          (if-let [v (merged t)] 
-            [k (v value)] 
-            (throw+ {:message (<< "validation of type ~{t} not found, did your forget to define it?") :type ::missing-validation }))) vs))))
+      (map
+        (fn [t]
+          (if-let [v (merged t)]
+            [k (v value)]
+            (throw (ex-info (<< "validation of type ~{t} not found, did your forget to define it?") {:type ::missing-validation})))) vs))))
 
-(defn run-validations 
-   "goes through validations" 
+(defn run-validations
+   "goes through validations"
    [m errors [k vs]]
-  (let [key-vals (zipmap (keyz m k) (get-in* m k)) 
+  (let [key-vals (zipmap (keyz m k) (get-in* m k))
         es (mapcat (partial run-vs vs) key-vals)]
     (deep-merge errors
-      (reduce 
+      (reduce
         (fn [res [k' message]]
           (if message (merge-with merge res (assoc-in res k' message)) res)) {} es))))
 
-(defn validate! 
-  "validates a map with given validations, returns error map (or execption see :error) 
+(defn validate!
+  "validates a map with given validations, returns error map (or execption see :error)
   options:
-  :error - will throw exception of type :error if provided (validate! t m :error ::non-valid-m)" 
+  :error - will throw exception of type :error if provided (validate! t m :error ::non-valid-m)"
   ([m validations & opts]
    (let [{:keys [error]} (apply hash-map opts) errors (validate! m validations)]
      (if (and error (-> errors empty? not))
-       (throw+ {:type error :errors errors}) 
+       (throw (ex-info "" {:type error :errors errors}))
         errors
        )))
   ([m validations]
    (reduce (partial run-validations m) {} (flatten-keys (expand validations (registry))))))
 
-(defn every-kv 
+(defn every-kv
   "Every key value validation helper"
   [vs]
-  (fn [m] 
+  (fn [m]
     (filter-empty
-       (map (fn [[k v]] 
+       (map (fn [[k v]]
          (let [res (validate! v vs)] (when (not-empty res) {k res}))) m))))
 
-(defn every-v 
+(defn every-v
   "Every value validation helper fn"
   [vs]
   (fn [s] (filter-empty (map-indexed (fn [i v] (validate! {i v} {i vs})) s))))
 
-(defn validation 
+(defn validation
   "define an custom validation with type and predicate"
   [type pred]
   (swap! externals assoc type pred))
 
-(defn combine 
+(defn combine
   "Combines a seq of validation descriptions"
   [& ds]
   (apply deep-merge-with union ds))
 
-(defn dissoc-set 
+(defn dissoc-set
    [m ks v]
    (reduce (fn [r k] (dissoc-in r (into ks [k]))) m v)
   )
 
 
-(defn subtract 
-   "Remove validations from an existing validation hash" 
+(defn subtract
+   "Remove validations from an existing validation hash"
    [m s]
    (reduce (fn [r [k v]] (dissoc-set r k v) ) m (flatten-keys s))
   )
